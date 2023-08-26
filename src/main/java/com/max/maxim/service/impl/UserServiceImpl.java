@@ -5,7 +5,7 @@ import com.max.maxim.dao.UserDao;
 import com.max.maxim.enums.user.RoleEnum;
 import com.max.maxim.service.UserService;
 import jakarta.annotation.Resource;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
@@ -29,7 +29,7 @@ public class UserServiceImpl implements UserService {
     user.setUserId(UUID.randomUUID().toString().substring(0, 20));
     user.setPassword(encryptor.encrypt(user.getPassword()));
     SimpleGrantedAuthority sga = new SimpleGrantedAuthority(RoleEnum.USER.name());
-    List<GrantedAuthority> gas = List.of(sga);
+    Set<GrantedAuthority> gas = Set.of(sga);
     user.setAuthorities(gas);
     userDao.insertOne(user);
     log.info("A new user {} is successfully inserted into db.", user);

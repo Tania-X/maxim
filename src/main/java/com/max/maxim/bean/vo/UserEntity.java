@@ -2,13 +2,12 @@ package com.max.maxim.bean.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Collection;
-import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
@@ -26,7 +25,7 @@ public class UserEntity implements UserDetails {
 
   private String password;
 
-  private List<GrantedAuthority> authorities;
+  private Collection<GrantedAuthority> authorities;
 
   @Override
   public boolean isAccountNonExpired() {
