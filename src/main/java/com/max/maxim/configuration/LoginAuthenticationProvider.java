@@ -2,9 +2,10 @@ package com.max.maxim.configuration;
 
 import com.max.maxim.user.CustomUserDetailsService;
 import jakarta.annotation.Resource;
-import java.util.List;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,10 +32,20 @@ public class LoginAuthenticationProvider implements AuthenticationProvider {
     if (ObjectUtils.isEmpty(userDetails)) {
       throw new UsernameNotFoundException("user not found.");
     }
-    String password = userDetails.getPassword();
-    password = encryptor.encrypt(password);
-    List<GrantedAuthority> authorities = (List<GrantedAuthority>) userDetails.getAuthorities();
-    return new UsernamePasswordAuthenticationToken(username, password, authorities);
+    String userPassword = (String) authentication.getCredentials();
+    if (ObjectUtils.isEmpty(userPassword)) {
+      log.warn("your input password is empty.");
+      throw new AuthenticationCredentialsNotFoundException("password empty.");
+    }
+    String dbPassword = userDetails.getPassword();
+    dbPassword = encryptor.decrypt(dbPassword);
+    if (!ObjectUtils.nullSafeEquals(userPassword, dbPassword)) {
+      log.warn("password not correct for your username.");
+      throw new AuthenticationCredentialsNotFoundException("password wrong.");
+    }
+    log.info("authentication succeeds, entering home...");
+    Set<GrantedAuthority> authorities = (Set<GrantedAuthority>) userDetails.getAuthorities();
+    return new UsernamePasswordAuthenticationToken(username, userPassword, authorities);
   }
 
   @Override
