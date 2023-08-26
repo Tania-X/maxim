@@ -16,7 +16,7 @@
             #{authorities,jdbcType=VARCHAR,typeHandler=com.max.maxim.handler.AuthoritiesStringConvertHandler});
   </insert>
 
-  <select id="loadUserByUsername" resultType="com.max.maxim.bean.vo.UserEntity">
+  <select id="loadUserByUsername" resultMap="userMap">
     select *
     from t_user u
     where u.username = #{username,jdbcType=VARCHAR};
