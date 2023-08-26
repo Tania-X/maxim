@@ -4,23 +4,22 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-public class AuthoritiesStringConvertHandler extends BaseTypeHandler<List<GrantedAuthority>> {
+public class AuthoritiesStringConvertHandler extends BaseTypeHandler<Collection<GrantedAuthority>> {
 
   @Override
-  public void setNonNullParameter(PreparedStatement ps, int i, List<GrantedAuthority> parameter,
+  public void setNonNullParameter(PreparedStatement ps, int i, Collection<GrantedAuthority> parameter,
       JdbcType jdbcType) throws SQLException {
     ps.setString(i, listToAuthoritiesConverter(parameter));
   }
 
-  private String listToAuthoritiesConverter(List<GrantedAuthority> parameters) {
+  private String listToAuthoritiesConverter(Collection<GrantedAuthority> parameters) {
     final String DELIMITER = ",";
     StringBuilder res = new StringBuilder();
     Iterator<GrantedAuthority> iterator = parameters.iterator();
@@ -34,26 +33,26 @@ public class AuthoritiesStringConvertHandler extends BaseTypeHandler<List<Grante
   }
 
   @Override
-  public List<GrantedAuthority> getNullableResult(ResultSet rs, String columnName) throws SQLException {
+  public Collection<GrantedAuthority> getNullableResult(ResultSet rs, String columnName) throws SQLException {
     String res = rs.getString(columnName);
     return authoritiesToListConverter(res);
   }
 
   @Override
-  public List<GrantedAuthority> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
+  public Collection<GrantedAuthority> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
     String res = rs.getString(columnIndex);
     return authoritiesToListConverter(res);
   }
 
   @Override
-  public List<GrantedAuthority> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
+  public Collection<GrantedAuthority> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
     String res = cs.getString(columnIndex);
     return authoritiesToListConverter(res);
   }
 
-  private List<GrantedAuthority> authoritiesToListConverter(String res) {
+  private Collection<GrantedAuthority> authoritiesToListConverter(String res) {
     final String DELIMITER = ",";
-    List<GrantedAuthority> gas = new ArrayList<>();
+    Collection<GrantedAuthority> gas = new HashSet<>();
     String[] resList = res.split(DELIMITER);
     for (String ga : resList) {
       gas.add(new SimpleGrantedAuthority(ga));
