@@ -1,6 +1,5 @@
-package com.max.maxim.configuration;
+package com.max.maxim.user;
 
-import com.max.maxim.user.CustomUserDetailsService;
 import jakarta.annotation.Resource;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.ObjectUtils;
 
 @Slf4j
-public class LoginAuthenticationProvider implements AuthenticationProvider {
+public class CustomAuthenticationProvider implements AuthenticationProvider {
 
   @Resource
   private CustomUserDetailsService userDetailsService;
