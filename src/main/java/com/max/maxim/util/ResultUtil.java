@@ -18,6 +18,12 @@ public class ResultUtil {
     return successResult;
   }
 
+  public static <T> ResultEntity<T> error(String message) {
+    ResultEntity<T> errorResult = error();
+    errorResult.setMessage(message);
+    return errorResult;
+  }
+
   public static <T> ResultEntity<T> error(Integer code, String message) {
     ResultEntity<T> errorResult = error();
     errorResult.setCode(code);
