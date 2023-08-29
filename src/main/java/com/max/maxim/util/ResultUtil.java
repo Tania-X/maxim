@@ -1,6 +1,7 @@
 package com.max.maxim.util;
 
 import com.max.maxim.bean.vo.ResultEntity;
+import com.max.maxim.enums.ResultEnum;
 
 public class ResultUtil {
 
@@ -28,6 +29,13 @@ public class ResultUtil {
     ResultEntity<T> errorResult = error();
     errorResult.setCode(code);
     errorResult.setMessage(message);
+    return errorResult;
+  }
+
+  public static <T> ResultEntity<T> error(ResultEnum resultEnum) {
+    ResultEntity<T> errorResult = error();
+    errorResult.setCode(resultEnum.getCode());
+    errorResult.setMessage(resultEnum.getMessage());
     return errorResult;
   }
 
