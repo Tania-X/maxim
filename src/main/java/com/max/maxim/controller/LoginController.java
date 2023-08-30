@@ -22,7 +22,7 @@ public class LoginController {
     HttpSession session = request.getSession();
     if (ObjectUtils.isEmpty(session.getAttribute("username"))) {
       log.warn("The user doesn't log in this app.");
-      return ResultUtil.error(ResultEnum.SESSION_NOT_EXISTS);
+      return ResultUtil.error(ResultEnum.USER_NOT_LOGIN);
     } else {
       return ResultUtil.success();
     }
