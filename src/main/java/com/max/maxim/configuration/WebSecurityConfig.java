@@ -1,17 +1,21 @@
 package com.max.maxim.configuration;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
+import com.max.maxim.user.CustomAuthenticationHandler;
+import com.max.maxim.user.CustomAuthenticationProvider;
+import com.max.maxim.user.CustomLoginFilter;
 import com.max.maxim.user.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -34,24 +38,45 @@ public class WebSecurityConfig {
    */
 
   @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration)
+      throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
+  }
+
+  @Bean
   public UserDetailsService userDetailsService() {
     return new CustomUserDetailsService();
   }
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
-    return new LoginAuthenticationProvider();
+    return new CustomAuthenticationProvider();
   }
 
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public CustomAuthenticationHandler customAuthenticationHandler() {
+    return new CustomAuthenticationHandler();
+  }
 
-    http
-        .authorizeHttpRequests(authorize -> authorize
-            .anyRequest().authenticated()
-        )
-        .formLogin(withDefaults())
-        .httpBasic(withDefaults());
+  @Bean
+  public CustomLoginFilter customLoginFilter(AuthenticationManager authenticationManager,
+      CustomAuthenticationHandler customAuthenticationHandler) throws Exception {
+    return new CustomLoginFilter(authenticationManager, customAuthenticationHandler);
+  }
+
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http, CustomLoginFilter loginFilter,
+      CustomAuthenticationHandler customAuthenticationHandler) throws Exception {
+
+    http.authorizeHttpRequests(
+            authorize -> authorize.requestMatchers(HttpMethod.GET, "/lgn/**").permitAll())
+        .authorizeHttpRequests(
+            authorize -> authorize.requestMatchers(HttpMethod.POST, "/login").permitAll())
+        .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
+    http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
+
+    http.csrf(AbstractHttpConfigurer::disable);
     return http.build();
   }
 
