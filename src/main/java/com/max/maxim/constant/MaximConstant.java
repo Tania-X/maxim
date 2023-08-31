@@ -8,5 +8,7 @@ public class MaximConstant {
 
   public static final String APPLICATION_JSON_CHARSET_UTF_8 = "application/json;charset=utf-8";
 
+  public static final String CAPTCHA_VERIFY_CODE = "verifyCode";
+
 
 }

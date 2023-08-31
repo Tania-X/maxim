@@ -3,14 +3,17 @@ package com.max.maxim.user;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.max.maxim.constant.MaximConstant;
+import com.max.maxim.exception.UserLoginException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,7 +26,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   public CustomLoginFilter(AuthenticationManager authenticationManager,
-      CustomAuthenticationHandler authenticationHandler) throws Exception {
+      CustomAuthenticationHandler authenticationHandler) {
     super(authenticationManager);
     setAuthenticationFailureHandler(authenticationHandler);
     setAuthenticationSuccessHandler(authenticationHandler);
@@ -36,8 +39,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     if (!ObjectUtils.isEmpty(contentType)) {
       return MaximConstant.APPLICATION_JSON_CHARSET_UTF_8.contains(contentType);
     }
-    // todo
-    throw new RuntimeException();
+    log.error("content-type in request invalid.");
+    throw new UserLoginException("content-type in request invalid.");
   }
 
   @Override
@@ -49,6 +52,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     }
     String username = null;
     String password = null;
+    String verifyCode = null;
     if (isContentTypeJson(request)) {
       try {
         Map<String, String> map = OBJECT_MAPPER.readValue(request.getInputStream(),
@@ -56,13 +60,30 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             });
         username = map.get(getUsernameParameter());
         password = map.get(getPasswordParameter());
+        verifyCode = map.get(MaximConstant.CAPTCHA_VERIFY_CODE);
       } catch (IOException e) {
         log.error("error occurs while reading username&password from request: {}.", request, e);
       }
     } else {
       username = obtainUsername(request);
       password = obtainPassword(request);
+      verifyCode = request.getParameter(MaximConstant.CAPTCHA_VERIFY_CODE);
     }
+    // verify the verifyCode
+    HttpSession session = request.getSession();
+    String verifyCodeOrig = (String) session.getAttribute(MaximConstant.CAPTCHA_VERIFY_CODE);
+    if (ObjectUtils.isEmpty(verifyCodeOrig)) {
+      log.error("verify code in memory not exist.");
+      throw new BadCredentialsException("verify code in memory not exist.");
+    } else if (ObjectUtils.isEmpty(verifyCode)) {
+      log.error("user input verify code is null.");
+      throw new BadCredentialsException("user input verify code is null.");
+    } else if (!ObjectUtils.nullSafeEquals(verifyCodeOrig, verifyCode)) {
+      log.warn("verify code not match. user input[{}], memory exists[{}].", verifyCode,
+          verifyCodeOrig);
+      throw new BadCredentialsException("verify code not match.");
+    }
+    session.removeAttribute(MaximConstant.CAPTCHA_VERIFY_CODE);
     username = (username != null) ? username.trim() : "";
     password = (password != null) ? password : "";
     UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(

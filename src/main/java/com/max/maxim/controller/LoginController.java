@@ -3,8 +3,10 @@ package com.max.maxim.controller;
 import com.max.maxim.bean.vo.DummyEntity;
 import com.max.maxim.bean.vo.ResultEntity;
 import com.max.maxim.enums.ResultEnum;
+import com.max.maxim.util.CaptchaUtil;
 import com.max.maxim.util.ResultUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.ObjectUtils;
@@ -26,6 +28,11 @@ public class LoginController {
     } else {
       return ResultUtil.success();
     }
+  }
+
+  @GetMapping("imageCode")
+  public void imageCode(HttpServletRequest request, HttpServletResponse response) {
+    CaptchaUtil.createImageCode(request, response);
   }
 
 }
