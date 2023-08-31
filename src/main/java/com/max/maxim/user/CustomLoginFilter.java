@@ -28,7 +28,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     setAuthenticationFailureHandler(authenticationHandler);
     setAuthenticationSuccessHandler(authenticationHandler);
     //login path
-    setFilterProcessesUrl("/login");
+    setFilterProcessesUrl("/app/login");
   }
 
   private static boolean isContentTypeJson(HttpServletRequest request) {

@@ -71,8 +71,6 @@ public class WebSecurityConfig {
 
     http.authorizeHttpRequests(
             authorize -> authorize.requestMatchers(HttpMethod.GET, "/lgn/**").permitAll())
-        .authorizeHttpRequests(
-            authorize -> authorize.requestMatchers(HttpMethod.POST, "/login").permitAll())
         .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
     http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
 
