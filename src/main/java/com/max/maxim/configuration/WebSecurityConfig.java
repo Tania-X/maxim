@@ -16,7 +16,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -78,7 +77,8 @@ public class WebSecurityConfig {
 
     http.csrf(AbstractHttpConfigurer::disable);
 
-    http.logout(authorize -> authorize.logoutUrl("/app/logout").logoutSuccessHandler(customAuthenticationHandler));
+    http.logout(authorize -> authorize.logoutUrl("/app/logout")
+        .logoutSuccessHandler(customAuthenticationHandler));
 
     return http.build();
   }

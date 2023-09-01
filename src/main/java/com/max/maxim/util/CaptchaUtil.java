@@ -38,7 +38,7 @@ public class CaptchaUtil {
     } catch (Exception e) {
       log.error("fail to create image code.", e);
     }
-    log.info("success in creating image code.");
+    log.info("succeed in creating image code.");
   }
 
 }
