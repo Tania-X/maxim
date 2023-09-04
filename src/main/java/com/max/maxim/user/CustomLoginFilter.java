@@ -3,7 +3,6 @@ package com.max.maxim.user;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.max.maxim.constant.MaximConstant;
-import com.max.maxim.exception.UserLoginException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -40,7 +39,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
       return MaximConstant.APPLICATION_JSON_CHARSET_UTF_8.contains(contentType);
     }
     log.error("content-type in request invalid.");
-    throw new UserLoginException("content-type in request invalid.");
+    throw new RuntimeException("content-type in request invalid.");
   }
 
   @Override
