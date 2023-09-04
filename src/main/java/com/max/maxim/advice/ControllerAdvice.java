@@ -17,6 +17,10 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
 @Component
@@ -27,19 +31,19 @@ public class ControllerAdvice {
 
   @Before("com.max.maxim.advice.Pointcuts.httpLog()")
   public void doBefore(JoinPoint joinPoint) {
-    HttpServletRequest request = null;
+    ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    Assert.notNull(requestAttributes, "requestAttributes should not be nullable.");
+    HttpServletRequest request = requestAttributes.getRequest();
     Object[] args = joinPoint.getArgs();
     List<Object> list = new ArrayList<>();
     for (Object arg : args) {
-      if (arg instanceof HttpServletRequest) {
-        request = (HttpServletRequest) arg;
-        list.add(HttpServletRequest.class.getSimpleName());
-      }
-      if (arg instanceof HttpServletResponse) {
-        list.add(HttpServletResponse.class.getSimpleName());
+      if (arg instanceof HttpServletRequest || arg instanceof HttpServletResponse) {
+        list.add(arg.getClass().getSimpleName());
+      } else {
+        list.add(arg);
       }
     }
-    if (request != null) {
+    if (!ObjectUtils.isEmpty(args)) {
       log.info(
           "http request info: uri={}, request method={}, source ip addr={}, called method={}.{}(), port={}, params={}",
           request.getRequestURI(), request.getMethod(), request.getRemoteHost(),
@@ -53,14 +57,14 @@ public class ControllerAdvice {
   }
 
   @Around("com.max.maxim.advice.Pointcuts.httpLog()")
-  public Object doAfterReturning(ProceedingJoinPoint joinPoint) {
+  public Object doAround(ProceedingJoinPoint joinPoint) {
     try {
       logTime.set(System.currentTimeMillis());
       MDC.put(MaximConstant.MAXIM_TRACE_ID,
           UUID.randomUUID().toString().replace("-", "").substring(0, 20));
       return joinPoint.proceed();
     } catch (Throwable t) {
-      log.warn("unified exception handled", t);
+      log.warn("AOP exception handled", t);
       ResultEntity<String> resResult = ResultUtil.error(t.getMessage());
       log.info("response content: {}, time cost: {} ms", resResult,
           (System.currentTimeMillis() - (logTime.get() == null ? System.currentTimeMillis()
