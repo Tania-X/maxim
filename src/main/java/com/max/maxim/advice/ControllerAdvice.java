@@ -16,9 +16,9 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.slf4j.MDC;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -36,14 +36,16 @@ public class ControllerAdvice {
     HttpServletRequest request = requestAttributes.getRequest();
     Object[] args = joinPoint.getArgs();
     List<Object> list = new ArrayList<>();
+    boolean flg = false;
     for (Object arg : args) {
       if (arg instanceof HttpServletRequest || arg instanceof HttpServletResponse) {
         list.add(arg.getClass().getSimpleName());
+        flg = true;
       } else {
         list.add(arg);
       }
     }
-    if (!ObjectUtils.isEmpty(args)) {
+    if (!flg) {
       log.info(
           "http request info: uri={}, request method={}, source ip addr={}, called method={}.{}(), port={}, params={}",
           request.getRequestURI(), request.getMethod(), request.getRemoteHost(),
@@ -57,7 +59,7 @@ public class ControllerAdvice {
   }
 
   @Around("com.max.maxim.advice.Pointcuts.httpLog()")
-  public Object doAround(ProceedingJoinPoint joinPoint) {
+  public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
     try {
       logTime.set(System.currentTimeMillis());
       MDC.put(MaximConstant.MAXIM_TRACE_ID,
@@ -65,20 +67,25 @@ public class ControllerAdvice {
       return joinPoint.proceed();
     } catch (Throwable t) {
       log.warn("AOP exception handled", t);
-      ResultEntity<String> resResult = ResultUtil.error(t.getMessage());
-      log.info("response content: {}, time cost: {} ms", resResult,
+      ResultEntity<String> retResult = ResultUtil.error(t.getMessage());
+      log.info("response content: {}, time cost: {} ms", retResult,
           (System.currentTimeMillis() - (logTime.get() == null ? System.currentTimeMillis()
               : logTime.get())));
-      return resResult;
+      // later process will be executed in this case, without which could result in class cast exception
+      if (t instanceof AuthenticationException) {
+        throw t;
+      } else {
+        return retResult;
+      }
     } finally {
       logTime.remove();
       MDC.remove(MaximConstant.MAXIM_TRACE_ID);
     }
   }
 
-  @AfterReturning(returning = "resResult", pointcut = "com.max.maxim.advice.Pointcuts.httpLog()")
-  public void doAfterReturning(Object resResult) {
-    log.info("response content: {}, time cost: {} ms", resResult,
+  @AfterReturning(returning = "retResult", pointcut = "com.max.maxim.advice.Pointcuts.httpLog()")
+  public void doAfterReturning(Object retResult) {
+    log.info("response content: {}, time cost: {} ms", retResult,
         (System.currentTimeMillis() - (logTime.get() == null ? System.currentTimeMillis()
             : logTime.get())));
     logTime.remove();
