@@ -49,7 +49,7 @@ public class CustomAuthenticationHandler implements AuthenticationSuccessHandler
     String detailMessage =
         authException.getClass().getSimpleName() + " " + authException.getLocalizedMessage();
     if (authException instanceof InsufficientAuthenticationException) {
-      detailMessage = "please visit after signing up";
+      detailMessage = "please login to access";
     }
     log.warn(detailMessage);
     response.setContentType(MaximConstant.APPLICATION_JSON_CHARSET_UTF_8);
