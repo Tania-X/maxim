@@ -70,7 +70,7 @@ public class WebSecurityConfig {
       CustomAuthenticationHandler customAuthenticationHandler) throws Exception {
 
     http.authorizeHttpRequests(
-            authorize -> authorize.requestMatchers(HttpMethod.GET, "/lgn/**").permitAll())
+            authorize -> authorize.requestMatchers(HttpMethod.GET, "/man/**").permitAll())
         .authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
 
     http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);

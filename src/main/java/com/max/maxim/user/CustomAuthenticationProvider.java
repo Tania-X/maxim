@@ -29,18 +29,18 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     String username = authentication.getName();
     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
     if (ObjectUtils.isEmpty(userDetails)) {
-      throw new UsernameNotFoundException("user not found.");
+      throw new UsernameNotFoundException("user not found");
     }
     String userPassword = (String) authentication.getCredentials();
     if (ObjectUtils.isEmpty(userPassword)) {
       log.warn("your input password is empty.");
-      throw new AuthenticationCredentialsNotFoundException("password empty.");
+      throw new AuthenticationCredentialsNotFoundException("password empty");
     }
     String dbPassword = userDetails.getPassword();
     dbPassword = encryptor.decrypt(dbPassword);
     if (!ObjectUtils.nullSafeEquals(userPassword, dbPassword)) {
       log.warn("password not correct for your username.");
-      throw new AuthenticationCredentialsNotFoundException("password wrong.");
+      throw new AuthenticationCredentialsNotFoundException("password wrong");
     }
     log.info("authentication succeeds, entering home...");
     Set<GrantedAuthority> authorities = (Set<GrantedAuthority>) userDetails.getAuthorities();

@@ -15,6 +15,11 @@
     values (#{userId,jdbcType=VARCHAR}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
             #{authorities,jdbcType=VARCHAR,typeHandler=com.max.maxim.handler.AuthoritiesStringConvertHandler});
   </insert>
+  <update id="updateOne">
+    update t_user u
+    set u.password = #{newPassword,jdbcType=VARCHAR}
+    where u.username = #{username,jdbcType=VARCHAR};
+  </update>
 
   <select id="loadUserByUsername" resultMap="userMap">
     select *

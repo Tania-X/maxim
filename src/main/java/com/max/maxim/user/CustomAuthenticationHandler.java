@@ -2,6 +2,7 @@ package com.max.maxim.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.max.maxim.constant.MaximConstant;
+import com.max.maxim.enums.ResultEnum;
 import com.max.maxim.util.ResultDetailUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,13 +49,13 @@ public class CustomAuthenticationHandler implements AuthenticationSuccessHandler
     String detailMessage =
         authException.getClass().getSimpleName() + " " + authException.getLocalizedMessage();
     if (authException instanceof InsufficientAuthenticationException) {
-      detailMessage = "please visit after signing up";
+      detailMessage = "please login to access";
     }
     log.warn(detailMessage);
     response.setContentType(MaximConstant.APPLICATION_JSON_CHARSET_UTF_8);
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.getWriter().println(OBJECT_MAPPER.writeValueAsString(
-        ResultDetailUtil.of(detailMessage, "authorization exception")));
+        ResultDetailUtil.of(detailMessage, "authorization exception", ResultEnum.ERROR.getCode())));
   }
 
   /**
@@ -81,7 +82,8 @@ public class CustomAuthenticationHandler implements AuthenticationSuccessHandler
     response.setContentType(MaximConstant.APPLICATION_JSON_CHARSET_UTF_8);
     response.setStatus(HttpStatus.FORBIDDEN.value());
     response.getWriter()
-        .println(OBJECT_MAPPER.writeValueAsString(ResultDetailUtil.of(detailMessage, "forbidden")));
+        .println(OBJECT_MAPPER.writeValueAsString(
+            ResultDetailUtil.of(detailMessage, "forbidden", ResultEnum.ERROR.getCode())));
 
   }
 
@@ -97,7 +99,8 @@ public class CustomAuthenticationHandler implements AuthenticationSuccessHandler
     response.setContentType(MaximConstant.APPLICATION_JSON_CHARSET_UTF_8);
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.getWriter().println(OBJECT_MAPPER.writeValueAsString(
-        ResultDetailUtil.of(exception.getLocalizedMessage(), "authentication failure")));
+        ResultDetailUtil.of(exception.getLocalizedMessage(), "authentication failure",
+            ResultEnum.ERROR.getCode())));
   }
 
   /**
@@ -121,7 +124,8 @@ public class CustomAuthenticationHandler implements AuthenticationSuccessHandler
         .setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
             SecurityContextHolder.getContext());
     response.getWriter().println(OBJECT_MAPPER.writeValueAsString(
-        ResultDetailUtil.of(authentication.toString(), "authentication success")));
+        ResultDetailUtil.of(authentication.toString(), "authentication success",
+            ResultEnum.SUCCESS.getCode())));
   }
 
   @Override
@@ -130,7 +134,8 @@ public class CustomAuthenticationHandler implements AuthenticationSuccessHandler
     response.setContentType(MaximConstant.APPLICATION_JSON_CHARSET_UTF_8);
     response.setStatus(HttpStatus.OK.value());
     response.getWriter().println(OBJECT_MAPPER.writeValueAsString(
-        ResultDetailUtil.of(authentication.toString(), "logout success")));
+        ResultDetailUtil.of(authentication.toString(), "logout success",
+            ResultEnum.SUCCESS.getCode())));
   }
 
   @Override
@@ -142,6 +147,7 @@ public class CustomAuthenticationHandler implements AuthenticationSuccessHandler
     response.setContentType(MaximConstant.APPLICATION_JSON_CHARSET_UTF_8);
     response.setStatus(HttpStatus.UNAUTHORIZED.value());
     response.getWriter().println(OBJECT_MAPPER.writeValueAsString(
-        ResultDetailUtil.of(event.getSessionInformation().toString(), message)));
+        ResultDetailUtil.of(event.getSessionInformation().toString(), message,
+            ResultEnum.ERROR.getCode())));
   }
 }

@@ -1,5 +1,8 @@
 package com.max.maxim.service;
 
+import com.max.maxim.bean.dto.UserUpdateDto;
+import com.max.maxim.bean.vo.DummyEntity;
+import com.max.maxim.bean.vo.ResultEntity;
 import com.max.maxim.bean.vo.UserEntity;
 
 public interface UserService {
@@ -16,7 +19,7 @@ public interface UserService {
    *
    * @param user user
    */
-  void update(UserEntity user);
+  ResultEntity<DummyEntity> update(UserUpdateDto user);
 
   /**
    * delete an existing user from db by user ID
