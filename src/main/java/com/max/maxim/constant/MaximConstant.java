@@ -10,5 +10,9 @@ public class MaximConstant {
 
   public static final String CAPTCHA_VERIFY_CODE = "verifyCode";
 
+  public static final int CLIENT_MODE = 0;
+
+  public static final int SERVER_MODE = 1;
+
 
 }
