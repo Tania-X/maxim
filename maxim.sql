@@ -1,7 +1,7 @@
 CREATE TABLE t_user (
                         id INT AUTO_INCREMENT PRIMARY KEY,
                         user_id VARCHAR(20) NOT NULL,
-                        username VARCHAR(50) NOT NULL,
+                        username VARCHAR(50) NOT NULL UNIQUE,
                         password VARCHAR(100) NOT NULL,
                         authorities VARCHAR(100) NOT NULL,
                         create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
