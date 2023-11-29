@@ -16,6 +16,25 @@
   <description>max-im</description>
   <properties>
     <java.version>17</java.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+
+    <!--docker镜像配置-->
+    <docker.skip.build>false</docker.skip.build>
+    <docker.dockerHost>http://xxx.xxx.xxx.xxx</docker.dockerHost>
+    <docker.image.prefix>artifactory.test.com:port/uri</docker.image.prefix>
+    <docker.registryUrl>https://artifactory.test.com:port</docker.registryUrl>
+    <docker.serverId>docker-hub-artifactory</docker.serverId>
+
+    <!--远程仓库地址-->
+    <artifactory.releases.url>http://artifactory.test.com:8081/artifactory/maven-releases-local
+    </artifactory.releases.url>
+    <artifactory.snapshots.url>http://artifactory.test.com:8081/artifactory/maven-snapshots-local
+    </artifactory.snapshots.url>
+    <artifactory.public>http://artifactory.test.com:8081/artifactory/maven-public
+    </artifactory.public>
+
+    <spring.boot.version>3.1.2</spring.boot.version>
   </properties>
   <dependencies>
     <dependency>
@@ -95,6 +114,80 @@
   </dependencies>
 
   <build>
+
+<!--    <pluginManagement>-->
+<!--      <plugins>-->
+<!--        <plugin>-->
+<!--          <groupId>com.spotify</groupId>-->
+<!--          <artifactId>docker-maven-plugin</artifactId>-->
+<!--          <version>1.2.1</version>-->
+<!--          <configuration>-->
+<!--            <skipDockerBuild>true</skipDockerBuild>-->
+<!--            <dockerHost>${docker.dockerHost}</dockerHost>-->
+<!--            <imageName>${docker.image.prefix}/${project.artifactId}</imageName>-->
+<!--            <dockerDirectory>${project.basedir}/src/main/docker</dockerDirectory>-->
+<!--            <resources>-->
+<!--              <resource>-->
+<!--                <targetPath>/</targetPath>-->
+<!--                <directory>${project.build.directory}</directory>-->
+<!--              </resource>-->
+<!--            </resources>-->
+<!--            <forceTags>true</forceTags>-->
+<!--            <imageTags>-->
+<!--              <imageTag>${project.version}</imageTag>-->
+<!--              <imageTag>latest</imageTag>-->
+<!--            </imageTags>-->
+<!--            <registryUrl>${docker.registryUrl}</registryUrl>-->
+<!--            <serverId>${docker.serverId}</serverId>-->
+<!--          </configuration>-->
+<!--          <executions>-->
+<!--            <execution>-->
+<!--              <id>build-image</id>-->
+<!--              <phase>deploy</phase>-->
+<!--              <goals>-->
+<!--                <goal>build</goal>-->
+<!--              </goals>-->
+<!--            </execution>-->
+<!--            <execution>-->
+<!--              <id>push-image-latest</id>-->
+<!--              <phase>deploy</phase>-->
+<!--              <goals>-->
+<!--                <goal>push</goal>-->
+<!--              </goals>-->
+<!--              <configuration>-->
+<!--                <imageName>${docker.image.prefix}/${project.artifactId}</imageName>-->
+<!--              </configuration>-->
+<!--            </execution>-->
+<!--            <execution>-->
+<!--              <id>push-image-version</id>-->
+<!--              <phase>deploy</phase>-->
+<!--              <goals>-->
+<!--                <goal>push</goal>-->
+<!--              </goals>-->
+<!--              <configuration>-->
+<!--                <imageName>${docker.image.prefix}/${project.artifactId}:${project.version}</imageName>-->
+<!--              </configuration>-->
+<!--            </execution>-->
+<!--          </executions>-->
+<!--        </plugin>-->
+<!--        <plugin>-->
+<!--          <groupId>org.apache.maven.plugins</groupId>-->
+<!--          <artifactId>maven-archetype-plugin</artifactId>-->
+<!--          <version>3.2.1</version>-->
+<!--        </plugin>-->
+
+<!--        <plugin>-->
+<!--          <groupId>org.springframework.boot</groupId>-->
+<!--          <artifactId>spring-boot-maven-plugin</artifactId>-->
+<!--          <version>${spring.boot.version}</version>-->
+<!--          <configuration>-->
+<!--            <fork>true</fork>-->
+<!--            <addResources>true</addResources>-->
+<!--          </configuration>-->
+<!--        </plugin>-->
+<!--      </plugins>-->
+<!--    </pluginManagement>-->
+
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
@@ -110,5 +203,38 @@
       </plugin>
     </plugins>
   </build>
+
+<!--  <repositories>-->
+<!--    <repository>-->
+<!--      <id>central</id>-->
+<!--      <name>artifactory-public</name>-->
+<!--      <url>${artifactory.public}</url>-->
+<!--    </repository>-->
+<!--  </repositories>-->
+<!--  <pluginRepositories>-->
+<!--    <pluginRepository>-->
+<!--      <id>central</id>-->
+<!--      <name>artifactory-public</name>-->
+<!--      <url>${artifactory.public}</url>-->
+<!--    </pluginRepository>-->
+<!--  </pluginRepositories>-->
+
+  <distributionManagement>
+<!--    <repository>-->
+<!--      <id>central</id>-->
+<!--      <name>artifactory-releases</name>-->
+<!--      <url>${artifactory.releases.url}</url>-->
+<!--    </repository>-->
+<!--    <snapshotRepository>-->
+<!--      <id>central</id>-->
+<!--      <name>artifactory-snapshots</name>-->
+<!--      <url>${artifactory.snapshots.url}</url>-->
+<!--    </snapshotRepository>-->
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/max/max-im</url>
+    </repository>
+  </distributionManagement>
 
 </project>
