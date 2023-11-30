@@ -232,7 +232,7 @@
 <!--    </snapshotRepository>-->
     <repository>
       <id>github</id>
-      <name>GitHub Packages</name>
+      <name>GitHub Tania-X Apache Maven Packages</name>
       <url>https://maven.pkg.github.com/Tania-X/max-im</url>
     </repository>
   </distributionManagement>
