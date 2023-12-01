@@ -233,7 +233,7 @@
     <repository>
       <id>github</id>
       <name>GitHub Tania-X Apache Maven Packages</name>
-      <url>https://maven.pkg.github.com/Tania-X/max-im</url>
+      <url>https://maven.pkg.github.com/Tania-X/maxim</url>
     </repository>
   </distributionManagement>
 
