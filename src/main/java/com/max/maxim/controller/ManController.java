@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.jasypt.encryption.StringEncryptor;
+import org.jasypt.exceptions.EncryptionOperationNotPossibleException;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,7 +55,18 @@ public class ManController {
   // attention: special characters like '+' should be converted according to ASCII: '+' -> '%2B'
   @GetMapping("decrypt")
   public ResultEntity<String> decrypt(@RequestParam String input) {
-    return ResultUtil.success(encryptor.decrypt(input));
+    if (ObjectUtils.isEmpty(input)) {
+      log.warn("input for decryption is empty or null.");
+      return ResultUtil.error(ResultEnum.INPUT_NULL_OR_EMPTY);
+    }
+    String decrypted;
+    try {
+      decrypted = encryptor.decrypt(input);
+    } catch (Exception e) {
+      log.error("encryption error", e);
+      throw new EncryptionOperationNotPossibleException(e);
+    }
+    return ResultUtil.success(decrypted);
   }
 
 }
